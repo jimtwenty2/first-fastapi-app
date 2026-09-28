@@ -1,4 +1,9 @@
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    text: str = 'hi'
+    is_done: bool = False
 
 app = FastAPI()
 
@@ -10,28 +15,28 @@ def root() -> dict:
 
 items = []
 
-@app.get('/items') 
-def get_items() -> dict:
-    return {
-        "items": items
-    }
+
+# @app.get('/items') 
+# def get_items() -> dict:
+#     return {
+#         "items": items
+#     }
+
+@app.get('/items')
+def list_items(limit: int=10):
+    return items[0:limit]
 
 @app.get('/items/{item_id}')
-def get_item_id(item_id: int) -> dict:
+def get_item_id(item_id: int) -> Item:
 
     if item_id - 1 > len(items):
         raise HTTPException(status_code=404, detail=f"Item {item_id} not found.")
     
     item = items[item_id-1]
-    return {
-        "item_id": item_id,
-        "item": item
-    }
+    return item
 
 @app.post('/items')
-def add_item(item: str) -> dict:
+def add_item(item: Item):
     items.append(item)
-    return {
-        "items":items
-    }
+    return items
 
