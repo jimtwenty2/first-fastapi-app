@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -18,6 +18,10 @@ def get_items() -> dict:
 
 @app.get('/items/{item_id}')
 def get_item_id(item_id: int) -> dict:
+
+    if item_id - 1 > len(items):
+        raise HTTPException(status_code=404, detail=f"Item {item_id} not found.")
+    
     item = items[item_id-1]
     return {
         "item_id": item_id,
